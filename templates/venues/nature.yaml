@@ -1,0 +1,94 @@
+id: nature
+name: "Nature — Nature Family Journals"
+category: high-impact-journal
+required_sections:
+  - abstract
+  - introduction
+  - results
+  - discussion
+  - methods
+  - references
+  - data-availability
+optional_sections:
+  - extended-data
+  - supplementary-information
+  - acknowledgements
+formatting:
+  max_words_main: 3000
+  max_display_items: 6
+  abstract_words: 150
+  abstract_structured: false
+  anonymous: false
+  double_blind: false
+  citation_style: "nature"
+  template: "nature-template"
+criteria:
+  - id: broad-significance
+    description: >
+      The finding must be of immediate interest to researchers across multiple disciplines,
+      not just the specialty sub-field. Nature rejects the majority of papers as 'more suitable
+      for a specialist journal'. This is the primary rejection criterion.
+    severity: critical
+    check_in: [abstract, introduction, discussion]
+  - id: reader-accessibility
+    description: >
+      The paper must be readable by a scientist outside the immediate sub-field.
+      §Introduction and §Discussion must not assume sub-field expertise.
+      Technical apparatus belongs in §Methods, not §Results.
+    severity: critical
+    check_in: [introduction, results, discussion]
+  - id: methodological-rigor
+    description: >
+      §Methods must contain sufficient detail for replication by an expert.
+      Statistical methods must be described specifically (not 'standard statistical tests').
+    severity: critical
+    check_in: [methods]
+  - id: data-availability
+    description: >
+      A Data Availability statement is mandatory. Data must be deposited in an appropriate
+      repository (e.g. Zenodo, figshare, NCBI GEO) or the statement must explain the restriction.
+    severity: critical
+    check_in: [data-availability]
+  - id: novelty-discovery
+    description: >
+      Nature expects a 'discovery' framing, not an incremental contribution framing.
+      The finding should change how researchers think about the problem.
+    severity: high
+    check_in: [abstract, introduction, discussion]
+  - id: word-count-compliance
+    description: >
+      Main text (excluding abstract, methods, references, figure captions) must not exceed
+      3,000 words for Letters; 5,500 words for Articles. Extended Data items (not figures)
+      are capped at 10.
+    severity: high
+    check_in: [formatting]
+  - id: statistical-completeness
+    description: >
+      Life sciences: n, biological replicates, confidence intervals mandatory.
+      Physical sciences: measurement uncertainties and error analysis mandatory.
+      'n=3' without justification is likely to trigger statistics reviewer.
+    severity: high
+    check_in: [methods, results]
+rejection_patterns:
+  - "Contribution suitable for a specialist journal rather than broad scientific readership"
+  - "Introduction assumes sub-field expertise — Nature's generalist readers will not engage"
+  - "Data not deposited in a public repository and no Data Availability statement present"
+  - "Statistical methods described generically ('Student's t-test') without specifics"
+  - "'n' values not stated or replicates not distinguished from technical repetitions"
+  - "Extended Data exceeds 10 items"
+  - "Discussion fails to frame discovery implications beyond the immediate specialty"
+  - "Competing interests statement absent"
+submission_notes: |
+  Nature operates on an editorial pre-screening (desk rejection before review) that
+  rejects approximately 70% of submissions. The cover letter is critically important —
+  it must articulate in 1-2 paragraphs why this finding matters beyond the specialty.
+
+  Structure: Nature Articles use Results → Discussion (not combined), with §Methods placed
+  at the end. For Letters the structure is more narrative — Introduction flows directly
+  into results without a separate section header. §Methods may be online-only.
+
+  Extended Data figures/tables are peer-reviewed; Supplementary Information is not.
+  Place essential quantitative support in Extended Data, not Supplementary Information.
+
+  Author contributions statement (CRediT taxonomy) is required for multi-author papers.
+  Competing interests statement is mandatory for all authors.

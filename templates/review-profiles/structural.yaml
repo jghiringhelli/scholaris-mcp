@@ -1,0 +1,76 @@
+id: structural
+name: "Structural & Completeness Analysis"
+description: >
+  Checks that all expected academic paper components are present, properly ordered,
+  and functionally complete. Catches missing sections, broken references,
+  missing baselines, and gaps between contribution claims and experimental evidence.
+dimensions:
+  - id: section-completeness
+    title: "Section Completeness"
+    description: >
+      Verifies that all standard sections expected for the venue are present
+      and contain substantive content (not just stubs).
+    prompts:
+      - "Are all venue-required sections present? (abstract, introduction, related work, method, experiments, conclusion, references)"
+      - "Is there a 'Limitations' section or explicit limitations paragraph in the conclusion?"
+      - "If human subjects are involved (HCI), is there an ethics/IRB statement?"
+      - "For empirical papers: is there an 'Experimental Setup' subsection clearly stating all parameters?"
+      - "Is there a 'Reproducibility' statement or code availability note?"
+    severity_guide:
+      critical: "A required section for the target venue is missing entirely."
+      high: "A section is present but functionally empty or < 3 sentences."
+      medium: "Optional but strongly expected section is absent."
+
+  - id: contribution-demonstration
+    title: "Contribution–Experiment Alignment"
+    description: >
+      Every stated contribution must have a corresponding experiment or proof.
+      This is the most common major revision trigger.
+    prompts:
+      - "List every contribution bullet from §Introduction. Does each have a direct experimental result?"
+      - "If the paper claims multiple contributions, are ALL of them evaluated — not just the primary one?"
+      - "Is there a table or figure that directly demonstrates the paper's primary claim?"
+      - "Are error bars, standard deviations, or confidence intervals reported on all numerical results?"
+      - "If the paper ablates its method, are ALL major design choices ablated, or only convenient ones?"
+    severity_guide:
+      critical: "A primary stated contribution has no supporting experiment in the paper."
+      high: "A contribution is partially supported — one key experimental condition is missing."
+      medium: "An ablation is incomplete or a minor variant was never evaluated."
+
+  - id: related-work-coverage
+    title: "Related Work Coverage"
+    description: >
+      Related work must acknowledge: (a) directly competing approaches,
+      (b) the most recent concurrent work, (c) the foundational work the paper builds on.
+    prompts:
+      - "Are the 3-5 most directly competing approaches discussed with specific technical differences stated?"
+      - "Is the paper's claim of 'first' or 'novel' defensible given the cited work?"
+      - "Does the related work appear to 'miss' any obvious prior work that reviewers will notice?"
+      - "Are the limitations of prior work described accurately — not strawmanned?"
+      - "Is the placement of related work appropriate for the venue (some venues prefer it after introduction; others after method)?"
+    severity_guide:
+      critical: "A directly competing approach that achieves comparable results is not cited."
+      high: "Related work is present but mischaracterizes or significantly understates prior work."
+      medium: "Some recent relevant citations are missing (last 1-2 years)."
+
+  - id: figures-tables
+    title: "Figures & Tables Quality"
+    description: >
+      Figures and tables carry a disproportionate share of a paper's persuasive load.
+      Each one must have a complete caption and must be directly referenced in the text.
+    prompts:
+      - "Is every figure and table referenced in the text? (No orphaned figures)"
+      - "Does every figure caption stand alone so that a reader who only reads captions understands the result?"
+      - "Are figure axes labeled with units?"
+      - "Is the primary result shown in a figure (not only a table)? A visual is more persuasive than numbers alone."
+      - "Are all baseline methods present in every comparison table (no missing entries as '—')?"
+      - "Are tables formatted consistently — decimal alignment, same number of significant figures throughout?"
+    severity_guide:
+      critical: "The primary contribution is not shown in any figure or table."
+      high: "A comparison table is missing a competitive baseline or has unexplained missing entries."
+      medium: "Caption quality issues or orphaned figures that reduce paper clarity."
+
+report_format:
+  per_section: true
+  include_quotes: false
+  remediation: true

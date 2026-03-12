@@ -1,0 +1,64 @@
+id: ieee
+name: "IEEE Transactions (TPAMI, TNNLS, TIP, etc.)"
+category: journal
+sections:
+  required:
+    - abstract
+    - introduction
+    - related work
+    - method
+    - experiments
+    - conclusion
+    - references
+  optional:
+    - appendix
+    - supplementary material
+formatting:
+  style: latex
+  citation: ieee
+  page_limit: 14
+criteria:
+  - id: novelty
+    description: "Technical contribution is clearly novel relative to prior IEEE publications."
+    severity: critical
+    check_in: [introduction, abstract]
+  - id: completeness
+    description: "Full method description, no critical details deferred to supplementary."
+    severity: critical
+    check_in: [method]
+  - id: reproducibility
+    description: "Implementation details sufficient for reproduction without author contact."
+    severity: high
+    check_in: [method, experiments]
+  - id: page-compliance
+    description: "Manuscript within 14-page limit (body); figures may extend to 1 extra page."
+    severity: high
+    check_in: [any]
+  - id: english-quality
+    description: "English is technically precise, grammatically correct, and formally styled."
+    severity: high
+    check_in: [any]
+  - id: citation-format
+    description: "All citations in IEEE format; no broken references."
+    severity: medium
+    check_in: [references]
+  - id: figure-quality
+    description: "Figures are vector graphics where possible; axis labels readable at print size."
+    severity: medium
+    check_in: [any]
+  - id: statistical-rigor
+    description: "Statistical significance tests used where applicable; error bars on plots."
+    severity: medium
+    check_in: [experiments]
+rejection_patterns:
+  - "Incremental extension of a conference paper without 30%+ new content"
+  - "Simultaneous submission to another IEEE venue"
+  - "Poor English language quality requiring extensive copyediting"
+  - "Figures at screen resolution, illegible in print"
+  - "Self-citation loop inflating prior work significance"
+  - "Missing comparison to state-of-the-art on canonical benchmarks"
+submission_notes: >
+  IEEE Transactions papers are expected to be significantly extended vs. conference versions
+  (30% new content minimum). Double-check the specific transaction's author guidelines —
+  page limits and supplement policies vary across TPAMI, TNNLS, TIP, etc.
+  Peer review is typically single-blind (reviewers know author identity at some transactions).

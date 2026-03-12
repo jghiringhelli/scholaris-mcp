@@ -1,0 +1,60 @@
+id: arxiv
+name: "arXiv (cs.AI / cs.CL / cs.LG / cs.CV)"
+category: preprint
+sections:
+  required:
+    - abstract
+    - introduction
+    - related work
+    - conclusion
+    - references
+  optional:
+    - method
+    - experiments
+    - appendix
+    - limitations
+formatting:
+  style: latex
+  citation: natbib
+  page_limit: null
+criteria:
+  - id: novelty
+    description: "Claims a clear, verifiable technical contribution over prior work."
+    severity: critical
+    check_in: [introduction, abstract]
+  - id: reproducibility
+    description: "Method described in sufficient detail for independent reproduction."
+    severity: high
+    check_in: [method, experiments]
+  - id: baselines
+    description: "Compares against relevant and reasonably strong baselines."
+    severity: high
+    check_in: [experiments]
+  - id: limitations
+    description: "Acknowledges failure modes, assumptions, or scope constraints."
+    severity: medium
+    check_in: [limitations, conclusion]
+  - id: ablations
+    description: "Includes ablation study isolating the contribution's components."
+    severity: medium
+    check_in: [experiments]
+  - id: statistical-significance
+    description: "Reports variance (std dev, confidence intervals) over multiple runs."
+    severity: medium
+    check_in: [experiments]
+  - id: ethical-considerations
+    description: "Comments on societal impact, data provenance, or bias if relevant."
+    severity: low
+    check_in: [any]
+rejection_patterns:
+  - "Incremental improvement over prior work without sufficient novelty framing"
+  - "Missing ablation studies for key design choices"
+  - "Comparison only against weak or outdated baselines"
+  - "Overclaiming in abstract relative to experimental results"
+  - "No variance reported (single-run numbers)"
+  - "Related work section misses directly competing concurrent work"
+submission_notes: >
+  arXiv is a preprint server with no formal peer review.
+  The community standard still expects rigorous methodology.
+  Include a clear 'Limitations' section — it signals intellectual honesty
+  and is expected for NeurIPS/ICML/ICLR camera-ready even when posting to arXiv.

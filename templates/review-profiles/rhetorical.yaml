@@ -1,0 +1,78 @@
+id: rhetorical
+name: "Rhetorical, Cadence & Persuasion Analysis"
+description: >
+  Examines how effectively the paper deploys academic rhetoric:
+  Aristotelian appeals (ethos, logos, pathos), argument cadence, framing,
+  and the persuasive journey from abstract to conclusion.
+dimensions:
+  - id: ethos-credibility
+    title: "Credibility & Ethos"
+    description: >
+      Academic credibility is established through precise language, honest acknowledgment
+      of limitations, and appropriate citation of prior work. Overuse of hedging signals
+      low confidence; under-hedging signals overreach.
+    prompts:
+      - "Do claim-hedging levels match actual uncertainty? ('we argue' vs 'we prove' vs 'we show')"
+      - "Are limitations acknowledged prominently, or buried in a final paragraph?"
+      - "Are prior works cited fairly — are adversarial or inconvenient results included?"
+      - "Is the paper's framing of its own contribution modest enough to be credible?"
+      - "Are numerical comparisons presented with appropriate precision (not more decimals than variance justifies)?"
+    severity_guide:
+      critical: "Systematic overreach or false precision that a domain expert will immediately distrust."
+      high: "Hedging mismatch — language stronger or weaker than evidence warrants throughout."
+      medium: "Isolated credibility lapses that a careful reader will note."
+
+  - id: logos-structure
+    title: "Logical Appeal & Structural Persuasion"
+    description: >
+      The logical appeal in academic writing is about the architecture of the argument:
+      the ratio of setup to contribution, problem framing, and payoff delivery.
+    prompts:
+      - "Does §Abstract earn its confidence level? Does it match the paper's actual contribution?"
+      - "Is §Introduction front-loaded correctly: problem → existing approaches → gap → contribution → paper map?"
+      - "Is the 'gap statement' specific and falsifiable, or vague ('X has not been studied')?"
+      - "Does the paper's problem framing make the contribution feel important, or does it undersell/oversell?"
+      - "Is the paper's structure revealed early (paper organization paragraph) so the reader knows where they are headed?"
+    severity_guide:
+      critical: "Abstract or Introduction structure actively misleads the reader about the paper's scope or contribution."
+      high: "Structural problem that causes a reader to lose the thread of the argument early."
+      medium: "Organizational choice that slows comprehension but doesn't mislead."
+
+  - id: cadence-rhythm
+    title: "Cadence, Rhythm & Flow"
+    description: >
+      The micro-level reading experience: sentence length variation, transitions,
+      paragraph topic sentence discipline, and section opening/closing strength.
+    prompts:
+      - "Are paragraph topic sentences strong and informative, or vague openers ('In this section...')?"
+      - "Is there sentence length variation that prevents monotony in dense technical sections?"
+      - "Do section transitions actively connect the preceding and following content, or are they abrupt?"
+      - "Are 'paragraph bombs' present — single paragraphs exceeding 200+ words in body text?"
+      - "Do section endings close the argument — or do they trail off into the next section's territory?"
+      - "Is the most important sentence in each paragraph the FIRST sentence, not buried at the end?"
+    severity_guide:
+      critical: "Flow problems so severe that understanding the contribution requires re-reading major sections."
+      high: "Cadence issues that make a 10-page paper feel like 20 pages to read."
+      medium: "Isolated rhythm problems in individual paragraphs."
+
+  - id: abstract-quality
+    title: "Abstract Quality"
+    description: >
+      The abstract is the highest-leverage single element of any paper.
+      It must compress problem, gap, method, result, and significance into ~250 words.
+    prompts:
+      - "Does the abstract follow the 5-element structure: context → problem → gap → approach → result?"
+      - "Is the result stated with a specific number, not vague qualitative language ('significantly improves')?"
+      - "Does the abstract stand alone — would a reader who reads only the abstract understand the contribution?"
+      - "Is the abstract ≤250 words? If over, which elements can be compressed?"
+      - "Does the first sentence hook the reader with the problem's importance, not a definition?"
+      - "Is the abstract written in present tense for contributions and past tense for the study itself?"
+    severity_guide:
+      critical: "Abstract does not communicate the contribution clearly — a reader selecting papers to read will skip it."
+      high: "Abstract structure is present but key elements are vague or missing."
+      medium: "Minor tightening opportunities that would improve abstract impact."
+
+report_format:
+  per_section: false
+  include_quotes: true
+  remediation: true

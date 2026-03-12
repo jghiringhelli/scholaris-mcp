@@ -1,0 +1,78 @@
+id: style
+name: "Style, Tone & Language Analysis"
+description: >
+  Evaluates the paper's language quality: register consistency (formal vs. informal),
+  hedging calibration, jargon appropriateness, passive/active voice balance,
+  and the precision of technical vocabulary.
+dimensions:
+  - id: register-consistency
+    title: "Register & Formality Consistency"
+    description: >
+      Academic papers require consistent formal register.
+      Colloquialisms, contractions, or informal phrasing break the register and signal
+      a paper that was not professionally proofread.
+    prompts:
+      - "Are there any contractions (don't, won't, it's) in the main body? These are not acceptable in formal academic text."
+      - "Are there colloquialisms or informal phrases ('a lot of', 'super helpful', 'pretty good')?"
+      - "Is the paper written in consistent person (first person plural preferred for most venues)?"
+      - "Is the tense consistent? (Present tense for claims; past tense for experiments performed)"
+      - "Does the paper switch between British and American English spelling?"
+    severity_guide:
+      critical: "Pervasive register violations that signal the paper needs significant language revision before review."
+      high: "Multiple register breaks in key sections (abstract, introduction) that will distract reviewers."
+      medium: "Isolated informal phrases in secondary sections."
+
+  - id: hedging-calibration
+    title: "Hedging Calibration"
+    description: >
+      Academic writing uses hedging to match claim strength with epistemic warrant.
+      Under-hedging (overclaiming) damages credibility; over-hedging (excessive qualification)
+      weakens the contribution's impact.
+    prompts:
+      - "Are strong claims ('proves', 'demonstrates', 'confirms') reserved for results with strong evidence?"
+      - "Is 'suggest' or 'indicate' used appropriately for weaker evidence?"
+      - "Does the paper use weasel phrases like 'it might perhaps be argued' that dilute the contribution?"
+      - "Are all 'significant' uses of the word significant? (Statistically? Practically? Qualitatively?)"
+      - "Does the paper list future limitations as absolutes ('future work will solve X') or appropriately tentative?"
+    severity_guide:
+      critical: "A core contribution claim is hedged so weakly it reads as speculation, or so strongly it overclaims."
+      high: "Systematic hedging imbalance throughout (excessive or insufficient) in key sections."
+      medium: "Isolated hedging miscalibration in secondary arguments."
+
+  - id: technical-precision
+    title: "Technical Vocabulary Precision"
+    description: >
+      Technical terms must be used consistently and precisely.
+      Inconsistent terminology between sections is a common problem in multi-author papers.
+    prompts:
+      - "Is the primary technical term for the proposed method used consistently throughout? (No accidental synonyms)"
+      - "Are notation conventions introduced before use and maintained consistently?"
+      - "Are all acronyms defined on first use and used consistently thereafter?"
+      - "Does the paper introduce undefined technical terms that domain experts might interpret differently?"
+      - "Are mathematical symbols introduced, defined, and used consistently with their first definition?"
+    severity_guide:
+      critical: "A key term is used with inconsistent meaning in different sections, creating ambiguity in the contribution."
+      high: "Terminology drift — the same concept referred to by different names forces re-reading to reconcile."
+      medium: "Minor notation inconsistencies or undefined acronyms on re-use."
+
+  - id: sentence-level-clarity
+    title: "Sentence-Level Clarity"
+    description: >
+      Common sentence-level problems that obscure technical communication:
+      excessive nominalization, dangling modifiers, passive voice overuse,
+      and overly complex sentence structures.
+    prompts:
+      - "Are there sentences with more than 3 clauses that could be split without losing meaning?"
+      - "Is passive voice used appropriately (to describe process) or overused to hide agency ('it was assumed that...')?"
+      - "Are there nominalized verbs that could be returned to verb form for clarity? ('the utilization of' → 'using')"
+      - "Are there sentences beginning with 'This' or 'It' where the referent is ambiguous?"
+      - "Are there opening subordinate clauses that delay the main point past the first line of a paragraph?"
+    severity_guide:
+      critical: "Dense sentence construction throughout major sections requires multiple readings to extract the technical content."
+      high: "Systematic passive voice overuse or nominalization in key claim-bearing sections."
+      medium: "Isolated complex sentences that benefit from splitting or restructuring."
+
+report_format:
+  per_section: false
+  include_quotes: true
+  remediation: true

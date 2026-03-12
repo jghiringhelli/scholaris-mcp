@@ -1,0 +1,71 @@
+id: icml
+name: "ICML — International Conference on Machine Learning"
+category: ml-conference
+required_sections:
+  - abstract
+  - introduction
+  - related-work
+  - method
+  - experiments
+  - conclusion
+  - broader-impact
+  - references
+optional_sections:
+  - appendix
+  - acknowledgements
+formatting:
+  max_pages: 8
+  appendix_policy: "Unlimited appendix, but reviewers are not required to read it."
+  anonymous: true
+  double_blind: true
+  citation_style: "icml2024"
+  template: "icml2024"
+criteria:
+  - id: novelty
+    description: "The paper introduces a conceptually new algorithm, theoretical result, or empirical finding that advances the field."
+    severity: critical
+    check_in: [introduction, method, conclusion]
+  - id: theoretical-grounding
+    description: "Either a formal proof of the main claim OR a principled empirical study with sufficient rigor. ICML values both tracks equally."
+    severity: critical
+    check_in: [method, experiments]
+  - id: broader-impacts
+    description: "A Broader Impacts section addressing potential societal consequences (positive and negative) of the work."
+    severity: high
+    check_in: [broader-impact]
+  - id: reproducibility
+    description: "Code released or reproducibility checklist completed. All hyperparameters, datasets, and compute requirements stated."
+    severity: high
+    check_in: [experiments, appendix]
+  - id: experimental-breadth
+    description: "Multiple benchmarks or datasets. Single-dataset papers require extremely strong theoretical grounding."
+    severity: high
+    check_in: [experiments]
+  - id: statistical-rigor
+    description: "Multiple random seeds reported. Standard deviations or confidence intervals present on all key metrics."
+    severity: high
+    check_in: [experiments]
+  - id: page-compliance
+    description: "Main text ≤ 8 pages (excluding references). Formatting matches official ICML template."
+    severity: high
+    check_in: [formatting]
+  - id: related-work-depth
+    description: "Recent relevant work from the past 2 years included. Key competing methods are technically differentiated, not just listed."
+    severity: medium
+    check_in: [related-work]
+rejection_patterns:
+  - "Incremental contribution without principled justification of design choices"
+  - "Empirical evaluation on a single dataset without strong theoretical backing"
+  - "Missing statistical significance or error bars on primary results"
+  - "Broader Impacts section absent or less than one substantive paragraph"
+  - "Related work that omits obvious competing approaches"
+  - "Code not released and no reproducibility statement"
+  - "Results not competitive with methods published at ICML/ICLR/NeurIPS in the past two years"
+submission_notes: |
+  ICML uses a double-blind review process — remove all author identifiers from the
+  submission including acknowledgements, self-citations in first person, and institutional
+  links in code repositories. The author response period is limited to 900 words total.
+  ICML Proceedings Checklist is mandatory since 2023, covering reproducibility,
+  ethics, and broader impact. Reviewers are instructed to penalize missing checklist items.
+  Appendix content is permitted but reviewers may not read it — place all critical
+  information in the main body. The camera-ready version adds one extra page.

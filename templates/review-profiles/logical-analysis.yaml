@@ -1,0 +1,62 @@
+id: logical
+name: "Logical & Argumentative Analysis"
+description: >
+  Systematic examination of the paper's inferential structure: validity of claims,
+  logical fallacies, burden-of-proof alignment, and the internal consistency
+  of arguments from premise to conclusion.
+dimensions:
+  - id: fallacy-scan
+    title: "Logical Fallacy Scan"
+    description: >
+      Identify named logical fallacies that undermine the paper's argumentative validity.
+      Focus on fallacies common in research papers, not rhetorical manipulation.
+    prompts:
+      - "Does the abstract overclaim beyond what the experiments actually demonstrate? (Hasty generalization)"
+      - "Are correlation ~ causation relationships correctly framed? (False causation)"
+      - "Does the paper compare against a weakened version of a competing approach? (Straw man)"
+      - "Is novelty claimed primarily on the basis that something has not been done before, without explaining why it matters? (Appeal to novelty)"
+      - "Are negative results from baselines attributed to the baseline's design choices or the task difficulty, rather than cherry-picked? (Cherry-picking)"
+      - "Does the paper assume its proposed metric is a valid proxy for the phenomenon it claims to measure? (Proxy fallacy)"
+      - "Is the conclusion stronger than the evidence supports? (Overreach)"
+    severity_guide:
+      critical: "The paper's core claim rests on a logical fallacy — the contribution does not hold without fixing it."
+      high: "A primary supporting argument is weakened by a fallacy; the conclusion still holds but is understated or overstated."
+      medium: "Peripheral arguments contain fallacies that reduce reader confidence without invalidating the contribution."
+
+  - id: claim-evidence-alignment
+    title: "Claim–Evidence Alignment"
+    description: >
+      Every empirical claim must be traceable to a specific experiment, table, or prior citation.
+      Directional claims ('X is better') require numeric support.
+    prompts:
+      - "List every quantitative claim in §Introduction and §Abstract. Does each have a corresponding result in §Experiments?"
+      - "Are directional claims ('X outperforms Y') accompanied by the specific metric and delta?"
+      - "Are claims about 'state of the art' backed by a comparison table including recent work?"
+      - "Do claims about generalizability rest on experiments across multiple datasets or domains?"
+      - "Are negative/null results reported or only the favorable conditions?"
+    severity_guide:
+      critical: "A key contribution claim has no supporting evidence in the paper."
+      high: "A directional claim is unsupported by numbers or the numbers contradict it."
+      medium: "A secondary claim is asserted without citation or experiment."
+
+  - id: argument-flow
+    title: "Argument Flow & Internal Consistency"
+    description: >
+      The paper should present a coherent chain of reasoning where each section's
+      conclusions follow from its premises and set up the next section.
+    prompts:
+      - "Does §Introduction state the problem, gap, and contribution in a logical sequence?"
+      - "Does §Related Work establish the gap that §Method addresses, or does it feel disconnected?"
+      - "Do §Experiment results support the §Introduction claims without introducing new claims not set up earlier?"
+      - "Does §Conclusion introduce implications not mentioned in §Discussion?"
+      - "Are there 'floating assertions' — statements made with confidence but never established?"
+      - "If the paper makes multiple contributions, are all of them actually demonstrated?"
+    severity_guide:
+      critical: "The paper claims a contribution in §Introduction that is never demonstrated in §Experiments."
+      high: "A logical gap between sections breaks the reasoning chain in a way a careful reviewer will notice."
+      medium: "Minor inconsistencies between section conclusions that affect cohesion but not submission viability."
+
+report_format:
+  per_section: true
+  include_quotes: true
+  remediation: true

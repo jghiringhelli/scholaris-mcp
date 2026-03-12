@@ -1,0 +1,67 @@
+id: acm
+name: "ACM SIGCHI / CSCW / CHI / UIST"
+category: conference
+sections:
+  required:
+    - abstract
+    - introduction
+    - related work
+    - method
+    - findings
+    - discussion
+    - conclusion
+    - references
+  optional:
+    - study design
+    - participants
+    - limitations
+    - future work
+formatting:
+  style: latex
+  citation: acm
+  page_limit: 12
+criteria:
+  - id: contribution-type
+    description: "Contribution type is explicit: empirical, artifact, theoretical, survey, or opinion."
+    severity: critical
+    check_in: [introduction]
+  - id: research-question
+    description: "Research question(s) or design goals are stated and addressed."
+    severity: critical
+    check_in: [introduction, method]
+  - id: participant-ethics
+    description: "Ethics approval mentioned for studies involving human participants."
+    severity: critical
+    check_in: [method, study design, participants]
+  - id: positionality
+    description: "Researcher positionality or study limitations acknowledged."
+    severity: high
+    check_in: [discussion, limitations]
+  - id: sample-justification
+    description: "Sample size motivated or saturation reached for qualitative work."
+    severity: high
+    check_in: [method, participants]
+  - id: related-work-breadth
+    description: "Related work covers HCI, CSCW, and relevant adjacent fields."
+    severity: high
+    check_in: [related work]
+  - id: implications
+    description: "Design or research implications are actionable and clearly stated."
+    severity: medium
+    check_in: [discussion, conclusion]
+  - id: accessibility
+    description: "Figures include alt text; color schemes are colorblind safe."
+    severity: medium
+    check_in: [any]
+rejection_patterns:
+  - "Human subjects study with no mention of ethics review / IRB"
+  - "Quantitative study replicated in HCI without meaningful extension or new context"
+  - "Missing positionality statement in qualitative / participatory research"
+  - "'5 participants on Mechanical Turk' without justification for small n"
+  - "No design implications or actionable recommendations"
+  - "Related work omits seminal HCI/CSCW work directly relevant to the contribution"
+submission_notes: >
+  ACM CHI and CSCW use a two-round review model for revisions (with an R&R option).
+  Anonymous submissions: ensure no author names in PDF, metadata stripped.
+  Use the ACM LaTeX template; margin violations cause desk rejection at some venues.
+  SIGCHI papers are double-blind; do not self-cite in a way that reveals authorship.

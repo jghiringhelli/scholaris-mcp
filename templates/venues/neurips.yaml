@@ -1,0 +1,61 @@
+id: neurips
+name: "NeurIPS (Neural Information Processing Systems)"
+category: conference
+sections:
+  required:
+    - abstract
+    - introduction
+    - related work
+    - method
+    - experiments
+    - conclusion
+    - references
+  optional:
+    - broader impacts
+    - limitations
+    - appendix
+formatting:
+  style: latex
+  citation: natbib
+  page_limit: 9
+criteria:
+  - id: novelty
+    description: "Clear technical advance; not a straightforward combination of existing ideas."
+    severity: critical
+    check_in: [introduction, abstract]
+  - id: broader-impacts
+    description: "Broader societal impacts section addressing positive and negative potential."
+    severity: critical
+    check_in: [broader impacts, conclusion]
+  - id: theoretical-grounding
+    description: "Theoretical analysis or proofs provided for core claims where applicable."
+    severity: high
+    check_in: [method]
+  - id: experimental-rigor
+    description: "Results on multiple datasets; ablations; comparison to strong recent baselines."
+    severity: high
+    check_in: [experiments]
+  - id: page-compliance
+    description: "Body ≤9 pages; references and appendix do not count toward limit."
+    severity: high
+    check_in: [any]
+  - id: checklist-compliance
+    description: "NeurIPS checklist completed honestly and submitted."
+    severity: high
+    check_in: [any]
+  - id: code-availability
+    description: "Code/data availability stated; anonymous repository provided if applicable."
+    severity: medium
+    check_in: [any]
+rejection_patterns:
+  - "Purely empirical paper without theoretical insight or strong novelty"
+  - "Missing or superficial Broader Impacts section"
+  - "Comparison only to baselines from 2+ years ago"
+  - "Body exceeds 9 pages"
+  - "NeurIPS checklist not attached or dishonestly completed"
+  - "Claims 'state of the art' without comparison to recent concurrent work"
+submission_notes: >
+  NeurIPS is double-blind. The Broader Impacts section is mandatory and reviewed.
+  Appendix is unlimited but reviewers are not required to read beyond 9 pages;
+  put all critical material in the main body.
+  The NeurIPS checklist (reproducibility, ethics, fairness) must accompany submission.
