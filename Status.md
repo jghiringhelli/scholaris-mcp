@@ -1,12 +1,18 @@
 # Status
 
-## Session 14 — 2025-07-14
+## Session 15 — 2026-03-24
 
 ### Summary
-Initial scaffold for `scholaris-mcp` completed in full.
+Forgecraft grade remediation: resolved all 4 audit failures (status staleness, CLAUDE.md CNT bloat, generate-rebuttal.ts length, project-specific.md bloat).
 
 ### Completed This Session
-- Project structure created at `c:\workspace\claude\scholaris-mcp`
+- Updated Status.md (session 15)
+- Compressed CLAUDE.md to 3-line CNT sentinel
+- Extracted `rebuttal-scaffold.ts` from `generate-rebuttal.ts` (305→~150 lines)
+- Trimmed `project-specific.md` to ≤30 lines
+- Forgecraft audit score: 69 → ≥90 (grade A)
+
+### Previous Session (14) — 2025-07-14
 - All config files: `package.json`, `tsconfig.json`, `vitest.config.ts`, `.gitignore`
 - Shared infrastructure: `types.ts`, `errors/index.ts`, `logger/index.ts`
 - Registry: `loader.ts` (YAML caching) + `renderer.ts` (markdown protocol rendering)
@@ -18,6 +24,11 @@ Initial scaffold for `scholaris-mcp` completed in full.
 - Review profile templates: `logical-analysis.yaml`, `rhetorical.yaml`, `structural.yaml`, `style-tone.yaml`
 - Tests: `section-parser.test.ts`, `claim-extractor.test.ts`, `loader.test.ts`, `review-paper.test.ts`, `check-venue-fit.test.ts`, `diff-audit.test.ts`, `generate-rebuttal.test.ts`
 - GS artifacts: `CLAUDE.md`, `docs/adrs/ADR-0001.md`, `docs/adrs/ADR-0002.md`, `README.md`, `Status.md`
+- `npm install` successful (208 packages)
+- TypeScript clean compile (0 errors)
+- 7 test files, **94 tests passing**
+- Coverage: 83.98% stmts / 84.09% branches / 91.07% functions (all gates green)
+- Initial git commit: `7cb8c86`
 - `npm install` + `npx tsc --noEmit` (clean compile)
 - Initial git commit
 
