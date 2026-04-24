@@ -1,0 +1,28 @@
+id: api-nullable-field-coercion
+title: Nullable field coercion on empty strings
+description: >-
+  Optional profile fields (bio, image) must be stored and returned as null when
+  the client sends an empty string. Storing "" produces a type inconsistency:
+  the API spec declares the field nullable, but an empty string is truthy and
+  semantically different from "not set". This gate is derived from Hurl RC1: the
+  Conduit contract test for PUT /api/user sent bio="" and asserted the response
+  contained null — the implementation returned "" and the test failed. Apply the
+  coercion at the service layer: bio === '' ? null : bio.
+category: Verifiable
+gsProperty: Verifiable
+phase: development
+hook: commit
+check: >-
+  hurl --test --variable host=http://localhost:3000
+  specs/api/hurl/update-user.hurl
+passCriterion: >-
+  Optional profile fields (bio, image) must be stored and returned as null when
+  the client sends an empty string.
+tags:
+  - API
+  - REST
+  - NODE
+  - TYPESCRIPT
+  - JAVASCRIPT
+  - DATABASE
+status: approved

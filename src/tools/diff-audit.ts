@@ -3,13 +3,23 @@
  * Given the current paper text and a list of changed sections,
  * computes which other sections need re-auditing due to claim cascade effects.
  *
+ * Uses two complementary signals:
+ *   1. Explicit cross-references detected by claim-extractor (certain cascade)
+ *   2. TF-IDF semantic coupling from semantic-section-graph (probabilistic cascade)
+ *
  * This solves the "change in §Introduction triggers new faults in §Discussion" problem
- * by building a section dependency graph and propagating change impact forward and backward.
+ * by building a combined dependency graph and propagating change impact.
  */
 
 import { z } from "zod";
 import { parseSections } from "../analyzers/section-parser.js";
-import { buildPaperDependencies, findAffectedSections } from "../analyzers/claim-extractor.js";
+import { buildPaperDependencies } from "../analyzers/claim-extractor.js";
+import {
+  buildSemanticSectionGraph,
+  findCascade,
+  couplingLabel,
+  STRONG_COUPLING_THRESHOLD,
+} from "../analyzers/semantic-section-graph.js";
 import { logger } from "../shared/logger/index.js";
 import type { HandlerResult } from "../shared/types.js";
 
@@ -69,31 +79,51 @@ export async function diffAuditHandler(args: DiffAuditArgs): Promise<HandlerResu
     !sections.some((s) => s.title.toLowerCase().includes(title.toLowerCase()))
   );
 
-  const affectedIds = findAffectedSections(changedIds, paper);
+  // ── Build semantic graph alongside explicit dependency graph ──────────────
+  const semanticGraph = buildSemanticSectionGraph(sections, paper.dependencies);
+  const cascadeMap = findCascade(changedIds, semanticGraph);
+
+  // Combine explicit claim-extractor results with semantic cascade
+  // (claim-extractor's findAffectedSections is now superseded by findCascade,
+  //  which already incorporates explicit deps via the graph builder)
+  const affectedIds = new Set(cascadeMap.keys());
   const affectedSections = sections.filter((s) => affectedIds.has(s.id));
+
+  // Sort: explicit-ref sections first, then by max similarity descending
+  affectedSections.sort((a, b) => {
+    const ea = cascadeMap.get(a.id)!;
+    const eb = cascadeMap.get(b.id)!;
+    if (ea.hasExplicitRef && !eb.hasExplicitRef) return -1;
+    if (eb.hasExplicitRef && !ea.hasExplicitRef) return 1;
+    return eb.maxSimilarity - ea.maxSimilarity;
+  });
 
   // Build re-audit instructions per affected section
   const reauditBlocks: string[] = [];
   for (const section of affectedSections) {
+    const entry = cascadeMap.get(section.id)!;
     const claimsInSection = paper.claims.filter(
       (c) => c.sectionId === section.id && c.references.some((r) => changedIds.includes(r))
     );
 
+    const simPct = Math.round(entry.maxSimilarity * 100);
+    const label = couplingLabel(entry.maxSimilarity, entry.hasExplicitRef ? "explicit" : "semantic");
+    const strongFlag = entry.maxSimilarity >= STRONG_COUPLING_THRESHOLD ? " ⚠️ **strong coupling**" : "";
+
     reauditBlocks.push(`### Re-audit: ${section.title}`);
     reauditBlocks.push("");
     reauditBlocks.push(
-      `**Why affected:** This section ${describeRelationship(section.id, changedIds, paper)}.`
+      `**Why affected:** ${label} (similarity ${simPct}%)${strongFlag}`
     );
 
     if (args.show_claims && claimsInSection.length > 0) {
       reauditBlocks.push("");
       reauditBlocks.push("**Specific claims to verify:**");
       for (const claim of claimsInSection.slice(0, 5)) {
-        // Show at most 5 per section to avoid overwhelming output
         reauditBlocks.push(`- *[${claim.type}]* ${truncate(claim.text, 120)}`);
       }
       if (claimsInSection.length > 5) {
-        reauditBlocks.push(`  *(${claimsInSection.length - 5} more claims — run with show_claims=true for full list)*`);
+        reauditBlocks.push(`  *(${claimsInSection.length - 5} more claims — rerun with show_claims=true)*`);
       }
     }
 
@@ -110,11 +140,15 @@ export async function diffAuditHandler(args: DiffAuditArgs): Promise<HandlerResu
     .map((id) => sections.find((s) => s.id === id)?.title ?? id)
     .join(", ");
 
+  const explicitCount = [...cascadeMap.values()].filter((e) => e.hasExplicitRef).length;
+  const semanticOnlyCount = affectedSections.length - explicitCount;
+
   const lines: string[] = [
     "# Diff Audit — Cascade Impact Report",
     "",
     `**Changed sections:** ${changedTitles || "(none matched)"}`,
-    `**Sections requiring re-audit:** ${affectedSections.length}`,
+    `**Sections requiring re-audit:** ${affectedSections.length}` +
+      (explicitCount > 0 ? ` (${explicitCount} explicit, ${semanticOnlyCount} semantic)` : ""),
     "",
   ];
 
@@ -131,13 +165,13 @@ export async function diffAuditHandler(args: DiffAuditArgs): Promise<HandlerResu
       "✅ **No cascade effects detected.**",
       "",
       "The changed sections appear to be self-contained — no other sections were found",
-      "to directly reference their claims. Manual review of the abstract and conclusion",
-      "is still recommended."
+      "to directly reference or share significant vocabulary with their claims.",
+      "Manual review of the abstract and conclusion is still recommended."
     );
   } else {
     lines.push(
       "The following sections contain claims or references that may be inconsistent",
-      "with the changes made. Re-audit each in the order listed.",
+      "with the changes made. Re-audit each in the order listed (highest priority first).",
       "",
       "─".repeat(70),
       "",
@@ -158,35 +192,11 @@ export async function diffAuditHandler(args: DiffAuditArgs): Promise<HandlerResu
   logger.info(MODULE, "Diff audit complete", {
     changedCount: changedIds.length,
     affectedCount: affectedSections.length,
+    explicitCount,
+    semanticOnlyCount,
   });
 
   return { content: [{ type: "text", text: lines.join("\n") }] };
-}
-
-/**
- * Describes why a section is affected relative to the changed sections.
- */
-function describeRelationship(
-  sectionId: string,
-  changedIds: ReadonlyArray<string>,
-  paper: ReturnType<typeof buildPaperDependencies>
-): string {
-  const deps = paper.dependencies.get(sectionId) ?? new Set();
-  const directRefs = [...deps].filter((d) => changedIds.includes(d));
-
-  if (directRefs.length > 0) {
-    return `references ${directRefs.join(", ")} (changed section${directRefs.length > 1 ? "s" : ""})`;
-  }
-
-  // Check reverse: changed section references this section
-  for (const changedId of changedIds) {
-    const changedDeps = paper.dependencies.get(changedId) ?? new Set();
-    if (changedDeps.has(sectionId)) {
-      return `is referenced by the changed content (forward reference may now be stale)`;
-    }
-  }
-
-  return `has indirect dependency on changed content`;
 }
 
 /** Truncates text to maxLength, adding ellipsis if needed. */

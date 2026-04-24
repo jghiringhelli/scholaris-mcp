@@ -118,6 +118,9 @@ export function titleToSlug(title: string, index: number): string {
  * @throws {PaperParseError} If the text is too short to parse meaningfully.
  */
 export function parseSections(text: string): ReadonlyArray<PaperSection> {
+  // Normalize CRLF to LF so heading regexes work on Windows-authored docs
+  text = text.replace(/\r\n/g, "\n");
+
   if (text.trim().length < 50) {
     throw new PaperParseError("Text too short to parse", text.slice(0, 100));
   }

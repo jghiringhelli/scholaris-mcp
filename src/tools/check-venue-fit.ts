@@ -2,16 +2,25 @@
  * check_venue_fit tool.
  * Assesses paper readiness for multiple publication venues simultaneously,
  * returning a comparison table with fit scores and gap analysis.
+ *
+ * Criterion matching uses vocabulary overlap scoring (from tfidf.ts) instead
+ * of the previous section-title heuristic. A criterion is considered "met" if
+ * the best-matching section has overlap ≥ OVERLAP_THRESHOLD (0.35) with the
+ * criterion's description terms.
  */
 
 import { z } from "zod";
 import { loadVenueProfiles } from "../registry/loader.js";
 import { renderVenueFitTable } from "../registry/renderer.js";
 import { parseSections } from "../analyzers/section-parser.js";
+import { vocabularyOverlap } from "../analyzers/tfidf.js";
 import { logger } from "../shared/logger/index.js";
 import type { HandlerResult, VenueProfile } from "../shared/types.js";
 
 const MODULE = "tools/check-venue-fit";
+
+/** A criterion is "met" if any section scores at least this overlap fraction. */
+const OVERLAP_THRESHOLD = 0.35;
 
 export const checkVenueFitSchema = z.object({
   paper_text: z
@@ -33,8 +42,8 @@ export type CheckVenueFitArgs = z.infer<typeof checkVenueFitSchema>;
 
 /**
  * Handles the check_venue_fit action.
- * Performs a structural criteria check for each venue (section presence,
- * formatting compliance) and returns a ranked fit table with gap details.
+ * Performs structural + vocabulary-overlap criteria matching for each venue
+ * and returns a ranked fit table with gap details.
  *
  * @param args - Validated input arguments.
  * @returns MCP content item containing the venue comparison.
@@ -71,7 +80,7 @@ export async function checkVenueFitHandler(args: CheckVenueFitArgs): Promise<Han
     const gaps: string[] = [];
     let matched = 0;
 
-    // Check required sections
+    // Check required sections (structural — title presence is sufficient)
     for (const required of (venue.sections?.required ?? [])) {
       const found = sectionTitles.some((t) => t.includes(required.toLowerCase()));
       if (found) {
@@ -81,17 +90,35 @@ export async function checkVenueFitHandler(args: CheckVenueFitArgs): Promise<Han
       }
     }
 
-    // Check criteria by section presence heuristic
+    // Check criteria using vocabulary overlap scoring
     for (const criterion of venue.criteria) {
       if (criterion.severity === "critical" || criterion.severity === "high") {
-        // Heuristic: paper "meets" a criterion if its check_in sections are present
-        const sectionsPresent = criterion.check_in.every((s) =>
-          s === "any" || sectionTitles.some((t) => t.includes(s.toLowerCase()))
-        );
-        if (sectionsPresent) {
+        // For each criterion, find the best-matching section by vocabulary overlap
+        const targetSections = criterion.check_in.includes("any")
+          ? sections
+          : sections.filter((s) =>
+              criterion.check_in.some((ci) =>
+                s.title.toLowerCase().includes(ci.toLowerCase())
+              )
+            );
+
+        // If no sections match the check_in list, fall back to all sections
+        const candidateSections = targetSections.length > 0 ? targetSections : sections;
+
+        const bestScore = candidateSections.reduce((best, section) => {
+          const score = vocabularyOverlap(criterion.description, section.content);
+          return score > best ? score : best;
+        }, 0);
+
+        if (bestScore >= OVERLAP_THRESHOLD) {
           matched++;
         } else {
-          gaps.push(`${severityBadge(criterion.severity)} **${criterion.id}** criterion: ${criterion.description}`);
+          const scoreLabel = sections.length === 0
+            ? "no sections detected"
+            : `best match: ${Math.round(bestScore * 100)}% overlap`;
+          gaps.push(
+            `${severityBadge(criterion.severity)} **${criterion.id}** (${scoreLabel}): ${criterion.description}`
+          );
         }
       }
     }
@@ -136,8 +163,8 @@ export async function checkVenueFitHandler(args: CheckVenueFitArgs): Promise<Han
       : []),
     "",
     "─".repeat(70),
-    "> **Note:** Fit scores are based on structural criteria only (section presence,",
-    "> formatting rules). Content quality, novelty, and significance require human review.",
+    "> **Note:** Fit scores use vocabulary-overlap matching against venue criteria.",
+    "> Content quality, novelty, and significance require human review.",
     "> Use `review_paper` with the top venue for a full content-aware review.",
     "",
     `\`files_created\`: []`,

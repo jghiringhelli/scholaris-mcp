@@ -1,0 +1,73 @@
+{
+  "mcpServers": {
+    "codeseeker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "codeseeker@2",
+        "serve",
+        "--mcp"
+      ],
+      "env": {
+        "CODESEEKER_STORAGE_MODE": "embedded"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ]
+    },
+    "forgecraft": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "forgecraft-mcp"
+      ]
+    },
+    "postman": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@anthropic/mcp-server-postman"
+      ],
+      "env": {
+        "POSTMAN_API_KEY": ""
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "spec-workflow": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "spec-workflow-mcp"
+      ]
+    }
+  },
+  "permissions": {
+    "allow": [
+      "mcp__codeseeker__*",
+      "mcp__filesystem__*",
+      "mcp__context7__*",
+      "mcp__forgecraft__*",
+      "mcp__postman__*",
+      "mcp__sequential-thinking__*",
+      "mcp__spec-workflow__*"
+    ]
+  }
+}

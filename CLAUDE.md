@@ -1,3 +1,5 @@
-# Scholaris MCP — adversarial academic paper review server. Tags: CLI · API · LIBRARY
-<!-- ForgeCraft sentinel | 2026-03-24 | npx forgecraft-mcp refresh . --apply to update -->
-Load `.claude/index.md` before any task.
+# scholaris-mcp
+<!-- ForgeCraft sentinel | 2026-04-20 | npx forgecraft-mcp refresh . --apply to update -->
+A cli, api, library project. Must not become a monolith.
+
+Read `.claude/index.md` before any task. Navigate to the relevant branch. Load core.md always.

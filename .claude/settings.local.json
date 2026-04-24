@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npx vitest *)",
+      "Bash(pdftotext \"C:/Users/JC/Downloads/gashe/2026.02.25.708045v1.full.pdf\" \"C:/Users/JC/Downloads/gashe/source.txt\")",
+      "Bash(pdftotext \"C:/Users/JC/Downloads/gashe/fmicb-12-707086.pdf\" \"C:/Users/JC/Downloads/gashe/ref1.txt\")",
+      "Bash(pdftotext \"C:/Users/JC/Downloads/gashe/s41467-019-11677-w.pdf\" \"C:/Users/JC/Downloads/gashe/ref2.txt\")",
+      "Bash(npm run *)"
+    ]
+  }
+}

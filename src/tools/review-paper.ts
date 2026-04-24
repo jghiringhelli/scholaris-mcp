@@ -8,6 +8,7 @@ import { z } from "zod";
 import { getVenueProfile, getReviewProfile } from "../registry/loader.js";
 import { renderReviewProtocol } from "../registry/renderer.js";
 import { parseSections } from "../analyzers/section-parser.js";
+import { scanProhibitions, renderProhibitionBlock } from "../analyzers/prohibition-scanner.js";
 import { ScholarisError } from "../shared/errors/index.js";
 import { logger } from "../shared/logger/index.js";
 import type { HandlerResult, ReviewProfileId, VenueId } from "../shared/types.js";
@@ -40,6 +41,12 @@ export const reviewPaperSchema = z.object({
     .string()
     .optional()
     .describe("Scope review to a specific section heading, e.g. 'Introduction'."),
+  focus_areas: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "Specific aspects to emphasise in the review, e.g. ['citation density', 'proof in Section 3']."
+    ),
 });
 
 export type ReviewPaperArgs = z.infer<typeof reviewPaperSchema>;
@@ -57,17 +64,23 @@ export async function reviewPaperHandler(args: ReviewPaperArgs): Promise<Handler
     profiles: args.profiles,
     format: args.format,
     section_focus: args.section_focus,
+    focus_areas: args.focus_areas,
     textLength: args.paper_text.length,
   });
 
-  // Parse sections
-  const allSections = parseSections(args.paper_text);
-  const sections =
-    args.section_focus
-      ? allSections.filter((s) =>
-          s.title.toLowerCase().includes(args.section_focus!.toLowerCase())
-        )
-      : allSections;
+  // ── Pre-flight: prohibition scan ─────────────────────────────────────────
+  const allSectionsForScan = parseSections(args.paper_text);
+  const sectionsToScan = args.section_focus
+    ? allSectionsForScan.filter((s) =>
+        s.title.toLowerCase().includes(args.section_focus!.toLowerCase())
+      )
+    : allSectionsForScan;
+
+  const scanResult = scanProhibitions(sectionsToScan);
+  const prohibitionBlock = renderProhibitionBlock(scanResult);
+
+  // ── Parse sections (reuse parsed result) ─────────────────────────────────
+  const sections = sectionsToScan; // already filtered for section_focus
 
   // Load venue (null for "general" — no venue-specific rules)
   const venueProfile =
@@ -87,13 +100,27 @@ export async function reviewPaperHandler(args: ReviewPaperArgs): Promise<Handler
     args.format
   );
 
+  // ── Focus areas block ─────────────────────────────────────────────────────
+  const focusBlock =
+    args.focus_areas && args.focus_areas.length > 0
+      ? [
+          "",
+          "## 🎯 Focus Areas",
+          "",
+          "Pay particular attention to the following during review:",
+          ...args.focus_areas.map((f) => `- ${f}`),
+        ].join("\n")
+      : "";
+
   // Append section map for orientation
   const sectionMap = sections
     .map((s, i) => `  ${i + 1}. ${s.title} (${s.content.length} chars)`)
     .join("\n");
 
   const output = [
+    prohibitionBlock,
     protocol,
+    focusBlock,
     "",
     "─".repeat(70),
     "## Paper Section Map (for reference)",
@@ -108,6 +135,8 @@ export async function reviewPaperHandler(args: ReviewPaperArgs): Promise<Handler
   logger.info(MODULE, "Review protocol rendered", {
     sectionCount: sections.length,
     profileCount: reviewProfiles.length,
+    prohibitionFindings: scanResult.findings.length,
+    prohibitionVerdict: scanResult.verdict,
   });
 
   return { content: [{ type: "text", text: output }] };

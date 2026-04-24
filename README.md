@@ -45,6 +45,14 @@ Or if installed globally:
 
 All actions are invoked through the single `scholaris` MCP tool with an `action` parameter.
 
+| Action | Tier | Description |
+|---|---|---|
+| `review_paper` | Free (structural + style) / Pro (all profiles) | Structured review protocol |
+| `check_venue_fit` | Free (arxiv, acm, ieee) / Pro (all venues) | Venue readiness comparison |
+| `diff_audit` | **Pro** | Cascade impact map after section revisions |
+| `generate_rebuttal` | **Pro** | Rebuttal scaffold from reviewer comments |
+| `check_citations` | **Pro** | Find papers that should cite you but don't |
+
 ---
 
 ### `review_paper`
@@ -126,6 +134,42 @@ scholaris(
 
 Output includes: opening statement → per-reviewer section → points sorted by severity
 (major first) → ACK/CLARIFY/REVISE scaffold per point → Summary of Changes block.
+
+---
+
+### `check_citations` *(Pro)*
+Semantic citation protection for independent researchers.
+
+Searches Semantic Scholar for recent papers that share your key claims but do not cite your work.
+Designed for solo researchers without institutional monitoring services.
+
+```
+scholaris(
+  action: "check_citations",
+  paper_text: "...",
+  paper_title: "Exact Title of Your Paper",
+  claims: [                           # Optional: override auto-extraction
+    "contrastive learning without negatives",
+    "momentum encoder EMA update"
+  ],
+  published_after: "2022",            # Optional: filter to papers after this year
+  max_results: 10                     # Default: 10, max: 20
+)
+```
+
+Output includes: ranked omission table → high-priority details → papers already citing you.
+Set `SEMANTIC_SCHOLAR_API_KEY` in the environment to raise the query rate limit.
+
+---
+
+## Pricing
+
+| Tier | Price | What's included |
+|------|-------|-----------------|
+| Free | Open source | `review_paper` (structural + style profiles), `check_venue_fit` (arxiv, acm, ieee) |
+| Pro  | $15/mo | All actions (`diff_audit`, `generate_rebuttal`, `check_citations`), all profiles, all venues — set `SCHOLARIS_LICENSE_KEY` |
+
+→ [Get a license key](https://forgeworkshop.dev/scholaris)
 
 ---
 
