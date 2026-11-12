@@ -46,10 +46,10 @@ scholaris-mcp solves these problems by automating the review protocol (4 profess
 | Action | Tier | Purpose |
 |--------|------|---------|
 | `review_paper` | Free | 4-dimension review (logical, rhetorical, structural, style) |
-| `check_venue_fit` | Free (3 venues) / Pro (6+) | Assess readiness across venues; rank by fit score; show gaps |
-| `diff_audit` | Pro | Map cascade effects after section revisions |
-| `generate_rebuttal` | Pro | Parse reviewer comments; scaffold point-by-point responses |
-| `check_citations` | Pro | Detect papers with vocabulary overlap not citing your work |
+| `check_venue_fit` | All 6 venues | Assess readiness across venues; rank by fit score; show gaps |
+| `diff_audit` | Free | Map cascade effects after section revisions |
+| `generate_rebuttal` | Free | Parse reviewer comments; scaffold point-by-point responses |
+| `check_citations` | Free | Detect papers with vocabulary overlap not citing your work |
 
 ### Core Analyzers
 - **section-parser:** Markdown heading-based extraction; robust to malformed/unsectioned text
@@ -62,8 +62,6 @@ scholaris-mcp solves these problems by automating the review protocol (4 profess
 - **loader.ts:** YAML file resolver; loads venue profiles and review profiles from `templates/`
 - **renderer.ts:** Converts YAML data + analyzed sections into formatted review reports and venue fit tables
 
-### License & Access Control
-- **license/index.ts:** Validates `SCHOLARIS_LICENSE_KEY` env var; gates Pro actions at dispatch layer
 
 ## External Systems
 
@@ -79,7 +77,6 @@ scholaris-mcp solves these problems by automating the review protocol (4 profess
 - Unified MCP router (single tool, action dispatch)
 - YAML template system for venues + review profiles
 - All 5 actions implemented (`review_paper`, `check_venue_fit`, `diff_audit`, `generate_rebuttal`, `check_citations`)
-- License tiering (free vs. Pro)
 - 80% test coverage
 
 ### Phase 2 — Venue Expansion (v0.2.0) 🔄 Planned

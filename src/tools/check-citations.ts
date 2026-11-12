@@ -1,5 +1,5 @@
 /**
- * check_citations tool (Pro).
+ * check_citations tool.
  *
  * Semantic citation protection for independent researchers.
  *

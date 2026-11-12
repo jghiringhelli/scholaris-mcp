@@ -1,5 +1,5 @@
 /**
- * detect_plagiarism tool (Pro).
+ * detect_plagiarism tool.
  *
  * Compares a source paper against one or more reference papers to detect
  * potential plagiarism at two levels:

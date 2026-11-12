@@ -1,5 +1,14 @@
 # Status
 
+## Session 16 - 2026-11-12
+
+### Summary
+Public-facing cleanup. All actions and venues are now free: the Pro tier, the license key check and the purchase link were removed (the link returned 404 and the key check accepted any non-empty value). The README now says the package is not on npm, shows how to run from source, and documents all seven actions. The local web server binds to 127.0.0.1 only.
+
+### State
+- Build: clean (`tsc`). Tests: 215 passing.
+- Not published on npm.
+
 ## Session 15 — 2026-03-24
 
 ### Summary

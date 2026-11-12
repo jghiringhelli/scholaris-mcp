@@ -21,13 +21,8 @@ app.post("/api/dispatch", async (req: Request, res: Response) => {
 });
 
 const PORT = Number(process.env.PORT ?? 3000);
-const isPro = Boolean(process.env.SCHOLARIS_LICENSE_KEY);
 
-app.listen(PORT, () => {
-  console.log(`
-  ╔══════════════════════════════════════════╗
-  ║  Scholaris Web  →  http://localhost:${PORT}  ║
-  ║  Tier: ${isPro ? "Pro  ✓ (all tools unlocked)     " : "Free (set SCHOLARIS_LICENSE_KEY=local)"}  ║
-  ╚══════════════════════════════════════════╝
-  `);
+// Loopback only: the server has no authentication.
+app.listen(PORT, "127.0.0.1", () => {
+  console.log(`Scholaris Web -> http://localhost:${PORT} (local only)`);
 });

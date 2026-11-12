@@ -15,8 +15,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "web": "tsx packages/web/server.ts",
-    "web:pro": "cross-env SCHOLARIS_LICENSE_KEY=local tsx packages/web/server.ts"
+    "web": "tsx packages/web/server.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",

@@ -59,14 +59,3 @@ export class TemplateLoadError extends ScholarisError {
     this.name = "TemplateLoadError";
   }
 }
-
-/** Thrown when a Pro-only feature is invoked without a valid license key. */
-export class ProFeatureError extends ScholarisError {
-  constructor(feature: string) {
-    super(
-      `"${feature}" is a Scholaris Pro feature. Set SCHOLARIS_LICENSE_KEY to unlock it. → https://forgeworkshop.dev/scholaris`,
-      { feature }
-    );
-    this.name = "ProFeatureError";
-  }
-}
