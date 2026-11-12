@@ -27,7 +27,10 @@ async function main(): Promise<void> {
       "  review_paper      — Structured review protocol targeting logical, rhetorical, structural, and style dimensions\n" +
       "  check_venue_fit   — Assess paper readiness across multiple publication venues\n" +
       "  diff_audit        — Detect cascade effects after section revisions\n" +
-      "  generate_rebuttal — Build structured rebuttal scaffold from reviewer comments",
+      "  generate_rebuttal — Build structured rebuttal scaffold from reviewer comments\n" +
+      "  check_citations   — Find papers that share your claims but do not cite you (Semantic Scholar)\n" +
+      "  detect_plagiarism — Compare a paper under investigation against your prior work\n" +
+      "  compress_draft   — Flag redundant, misplaced or removable sections",
     scholarisMcpSchema.shape,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (args): Promise<any> => {

@@ -41,7 +41,7 @@ async function rateLimitedFetch(url: string): Promise<Response> {
 
   const apiKey = process.env["SEMANTIC_SCHOLAR_API_KEY"];
   const headers: Record<string, string> = {
-    "User-Agent": "Scholaris-MCP/0.1 (scholaris academic review tool; https://forgeworkshop.dev/scholaris)",
+    "User-Agent": "Scholaris-MCP/0.1 (academic paper review tool; https://github.com/jghiringhelli/scholaris-mcp)",
   };
   if (apiKey) headers["x-api-key"] = apiKey;
 

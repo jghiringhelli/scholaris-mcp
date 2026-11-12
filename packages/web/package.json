@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx server.ts",
-    "dev:pro": "cross-env SCHOLARIS_LICENSE_KEY=local tsx server.ts"
+    "dev": "tsx server.ts"
   },
   "dependencies": {
     "express": "^4.21.2"

@@ -13,7 +13,6 @@ import { checkCitationsHandler } from "./check-citations.js";
 import { detectPlagiarismHandler } from "./detect-plagiarism.js";
 import { compressDraftHandler } from "./compress-draft.js";
 import { MissingParameterError, ScholarisError } from "../shared/errors/index.js";
-import { isPro, requirePro, freeVenues, freeProfiles } from "../shared/license/index.js";
 import { logger } from "../shared/logger/index.js";
 
 const MODULE = "tools/scholaris-router";
@@ -41,8 +40,8 @@ export const scholarisMcpSchema = z.object({
       "  check_venue_fit     — Compare paper readiness across multiple venues\n" +
       "  diff_audit          — Detect cascade effects after section revisions\n" +
       "  generate_rebuttal   — Build structured rebuttal scaffold from reviewer comments\n" +
-      "  check_citations     — [Pro] Find papers that should cite you but don't\n" +
-      "  detect_plagiarism   — [Pro] Detect plagiarism between a source paper and your prior work\n" +
+      "  check_citations     — Find papers that should cite you but don't\n" +
+      "  detect_plagiarism   — Detect plagiarism between a source paper and your prior work\n" +
       "  compress_draft      — Flag redundant, misplaced, or removable sections (Saint-Exupéry test)"
   ),
 
@@ -112,7 +111,7 @@ export const scholarisMcpSchema = z.object({
     .optional()
     .describe("Rebuttal tone. Default: 'collegial'."),
 
-  // ── check_citations (Pro) ──────────────────────────────────────────────────
+  // ── check_citations ──────────────────────────────────────────────────
   paper_authors: z
     .array(z.string())
     .optional()
@@ -136,7 +135,7 @@ export const scholarisMcpSchema = z.object({
     .optional()
     .describe("Max papers to return in check_citations. Default: 10."),
 
-  // ── detect_plagiarism (Pro) ────────────────────────────────────────────────
+  // ── detect_plagiarism ────────────────────────────────────────────────
   source_doi: z
     .string()
     .optional()
@@ -172,7 +171,7 @@ export const scholarisMcpSchema = z.object({
     .optional()
     .describe("Minimum Jaccard score to report a suspicious passage (default 0.20)."),
 
-  // ── compress_draft (free) ──────────────────────────────────────────────────
+  // ── compress_draft ──────────────────────────────────────────────────
   compression_mode: z
     .enum(["aggressive", "moderate", "light"])
     .optional()
@@ -204,21 +203,7 @@ export async function dispatch(input: unknown) {
 
   switch (args.action as Action) {
     case "review_paper": {
-      const requestedProfiles = args.profiles ?? ["logical", "structural"];
-      let profilesToUse = requestedProfiles;
-      let profileNote: string | null = null;
-
-      if (!isPro()) {
-        const free = freeProfiles();
-        const blocked = requestedProfiles.filter((p) => !free.includes(p));
-        profilesToUse = requestedProfiles.filter((p) => free.includes(p));
-        if (profilesToUse.length === 0) profilesToUse = ["structural"];
-        if (blocked.length > 0) {
-          profileNote =
-            `\n\n> **Note:** The **${blocked.join("** and **")}** profile(s) require Scholaris Pro. ` +
-            `Set SCHOLARIS_LICENSE_KEY to unlock. → https://forgeworkshop.dev/scholaris`;
-        }
-      }
+      const profilesToUse = args.profiles ?? ["logical", "structural"];
 
       const reviewResult = await reviewPaperHandler({
         paper_text: requireParam(args.paper_text, "paper_text", "review_paper"),
@@ -229,43 +214,20 @@ export async function dispatch(input: unknown) {
         focus_areas: args.focus_areas,
       });
 
-      if (profileNote) reviewResult.content[0].text += profileNote;
       return reviewResult;
     }
 
     case "check_venue_fit": {
-      type VenueEnum = "arxiv" | "ieee" | "acm" | "nature" | "neurips" | "icml";
-      let venuesToUse: VenueEnum[] | undefined = args.venues;
-      let venueNote: string | null = null;
-
-      if (!isPro()) {
-        const free = freeVenues();
-        if (venuesToUse !== undefined) {
-          const blocked = venuesToUse.filter((v) => !free.includes(v));
-          const allowed = venuesToUse.filter((v) => free.includes(v));
-          venuesToUse = allowed.length > 0 ? (allowed as VenueEnum[]) : undefined;
-          if (blocked.length > 0) {
-            venueNote =
-              `\n\n> **Note:** The **${blocked.join("**, **")}** venue(s) require Scholaris Pro. ` +
-              `Set SCHOLARIS_LICENSE_KEY to unlock. → https://forgeworkshop.dev/scholaris`;
-          }
-        } else {
-          venuesToUse = free as VenueEnum[];
-        }
-      }
-
       const venueResult = await checkVenueFitHandler({
         paper_text: requireParam(args.paper_text, "paper_text", "check_venue_fit"),
-        venues: venuesToUse,
+        venues: args.venues,
         show_gaps: args.show_gaps ?? true,
       });
 
-      if (venueNote) venueResult.content[0].text += venueNote;
       return venueResult;
     }
 
     case "diff_audit":
-      requirePro("diff_audit");
       return diffAuditHandler({
         paper_text: requireParam(args.paper_text, "paper_text", "diff_audit"),
         changed_sections: requireParam(args.changed_sections, "changed_sections", "diff_audit"),
@@ -273,7 +235,6 @@ export async function dispatch(input: unknown) {
       });
 
     case "generate_rebuttal":
-      requirePro("generate_rebuttal");
       return generateRebuttalHandler({
         reviewer_comments: requireParam(
           args.reviewer_comments,
@@ -286,7 +247,6 @@ export async function dispatch(input: unknown) {
       });
 
     case "check_citations":
-      requirePro("check_citations");
       return checkCitationsHandler({
         paper_text: requireParam(args.paper_text, "paper_text", "check_citations"),
         paper_title: requireParam(args.paper_title, "paper_title", "check_citations"),
@@ -297,7 +257,6 @@ export async function dispatch(input: unknown) {
       });
 
     case "detect_plagiarism":
-      requirePro("detect_plagiarism");
       return detectPlagiarismHandler({
         source_paper_text: args.source_paper_text,
         source_doi: args.source_doi,

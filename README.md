@@ -9,49 +9,45 @@ new inconsistencies. `diff_audit` maps these dependencies automatically.
 
 ## Install
 
+Scholaris is not published on npm. Run it from source (Node 18 or later):
+
 ```bash
-npm install -g scholaris-mcp
-# or via npx (no install required)
+git clone https://github.com/jghiringhelli/scholaris-mcp
+cd scholaris-mcp
+npm install
+npm run build
 ```
 
-## Configure in Claude Desktop
+## Configure in an MCP client (for example Claude Desktop)
 
-Add to `claude_desktop_config.json`:
+Add to `claude_desktop_config.json`, using the absolute path to your clone:
 
 ```json
 {
   "mcpServers": {
     "scholaris": {
-      "command": "npx",
-      "args": ["-y", "scholaris-mcp"]
+      "command": "node",
+      "args": ["/absolute/path/to/scholaris-mcp/dist/index.js"]
     }
   }
 }
 ```
 
-Or if installed globally:
-
-```json
-{
-  "mcpServers": {
-    "scholaris": {
-      "command": "scholaris-mcp"
-    }
-  }
-}
-```
+Everything is free and open source. There are no tiers, license keys or accounts.
 
 ## Actions
 
 All actions are invoked through the single `scholaris` MCP tool with an `action` parameter.
 
-| Action | Tier | Description |
-|---|---|---|
-| `review_paper` | Free (structural + style) / Pro (all profiles) | Structured review protocol |
-| `check_venue_fit` | Free (arxiv, acm, ieee) / Pro (all venues) | Venue readiness comparison |
-| `diff_audit` | **Pro** | Cascade impact map after section revisions |
-| `generate_rebuttal` | **Pro** | Rebuttal scaffold from reviewer comments |
-| `check_citations` | **Pro** | Find papers that should cite you but don't |
+| Action | Description |
+|---|---|
+| `review_paper` | Structured review protocol (logical, rhetorical, structural, style) |
+| `check_venue_fit` | Venue readiness comparison across arxiv, ieee, acm, nature, neurips, icml |
+| `diff_audit` | Cascade impact map after section revisions |
+| `generate_rebuttal` | Rebuttal scaffold from reviewer comments |
+| `check_citations` | Find papers that share your claims but do not cite you (Semantic Scholar) |
+| `detect_plagiarism` | Compare a paper under investigation against your prior papers (topical TF-IDF and verbatim 5-gram overlap) |
+| `compress_draft` | Flag redundant, misplaced or removable sections |
 
 ---
 
@@ -137,7 +133,7 @@ Output includes: opening statement → per-reviewer section → points sorted by
 
 ---
 
-### `check_citations` *(Pro)*
+### `check_citations`
 Semantic citation protection for independent researchers.
 
 Searches Semantic Scholar for recent papers that share your key claims but do not cite your work.
@@ -162,14 +158,33 @@ Set `SEMANTIC_SCHOLAR_API_KEY` in the environment to raise the query rate limit.
 
 ---
 
-## Pricing
+### `detect_plagiarism`
+Compare a paper under investigation against up to five of your own earlier papers.
+Reports topical similarity (TF-IDF cosine) and verbatim similarity (word 5-gram Jaccard on sentence pairs).
+It reports overlap, not intent: a human has to judge what the overlap means.
 
-| Tier | Price | What's included |
-|------|-------|-----------------|
-| Free | Open source | `review_paper` (structural + style profiles), `check_venue_fit` (arxiv, acm, ieee) |
-| Pro  | $15/mo | All actions (`diff_audit`, `generate_rebuttal`, `check_citations`), all profiles, all venues — set `SCHOLARIS_LICENSE_KEY` |
+```
+scholaris(
+  action: "detect_plagiarism",
+  source_paper_text: "...",           # or source_doi: "10.xxxx/..."
+  reference_paper_texts: ["...", "..."],   # or reference_dois (max 5)
+  similarity_threshold: 0.20          # Optional, 0.05 to 0.9
+)
+```
 
-→ [Get a license key](https://forgeworkshop.dev/scholaris)
+---
+
+### `compress_draft`
+Flags sections that repeat an earlier section, are disproportionately long, or sit in the wrong place.
+Verdicts per section: `load-bearing`, `remove`, `compress`, `relocate`, `review`.
+
+```
+scholaris(
+  action: "compress_draft",
+  paper_text: "...",
+  compression_mode: "moderate"        # "aggressive" | "moderate" | "light"
+)
+```
 
 ---
 
@@ -181,6 +196,10 @@ Set `SEMANTIC_SCHOLAR_API_KEY` in the environment to raise the query rate limit.
 
 Templates are YAML data files. Add new venues or profiles by following the schema
 in [CLAUDE.md](CLAUDE.md) — no TypeScript changes required.
+
+## Web UI (local)
+
+`npm install --prefix packages/web && npm run web` serves a local page at http://localhost:3000. It listens on the loopback interface only and has no authentication.
 
 ## Development
 
@@ -205,7 +224,3 @@ docs/adrs/                — Architecture Decision Records
 ```
 
 See [docs/adrs/](docs/adrs/) for architectural decisions.
-
-## Related
-
-- [forgecraft-mcp](https://github.com/jghiringhelli/forgecraft-mcp): Project infrastructure generator for AI-assisted development

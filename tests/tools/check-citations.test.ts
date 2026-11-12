@@ -198,13 +198,8 @@ const MINIMAL_PAPER =
   "## Method\n\nThe encoder uses EMA updates to maintain stable representations.\n\n" +
   "## Experiments\n\nWe evaluate on ImageNet with linear evaluation protocol and achieve strong results.";
 
-describe("checkCitationsHandler — Pro feature mechanics", () => {
-  beforeEach(() => {
-    process.env["SCHOLARIS_LICENSE_KEY"] = "test-key-123";
-  });
-
+describe("checkCitationsHandler", () => {
   afterEach(() => {
-    delete process.env["SCHOLARIS_LICENSE_KEY"];
     vi.restoreAllMocks();
   });
 
@@ -359,25 +354,5 @@ describe("checkCitationsHandler — Pro feature mechanics", () => {
     // Fetch should have been called with the provided claim
     const calledUrl = fetchMock.mock.calls[0]?.[0] as string;
     expect(calledUrl).toContain(encodeURIComponent("my specific claim phrase"));
-  });
-});
-
-// ── Pro gate ─────────────────────────────────────────────────────────────────
-
-describe("check_citations Pro gate", () => {
-  afterEach(() => {
-    delete process.env["SCHOLARIS_LICENSE_KEY"];
-  });
-
-  it("router throws ProFeatureError when SCHOLARIS_LICENSE_KEY is unset", async () => {
-    delete process.env["SCHOLARIS_LICENSE_KEY"];
-    const { dispatch } = await import("../../src/tools/scholaris-router.js");
-    await expect(
-      dispatch({
-        action: "check_citations",
-        paper_text: MINIMAL_PAPER,
-        paper_title: MY_PAPER_TITLE,
-      })
-    ).rejects.toMatchObject({ name: "ProFeatureError" });
   });
 });
